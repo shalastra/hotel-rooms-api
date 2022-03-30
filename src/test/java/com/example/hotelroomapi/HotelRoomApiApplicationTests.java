@@ -1,5 +1,6 @@
 package com.example.hotelroomapi;
 
+import com.example.hotelroomapi.request.RequestedRooms;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,36 +23,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest
 class HotelRoomApiApplicationTests {
 
-    private static final String someInput = "[23, 45, 155, 374, 22, 99.99, 100, 101, 115, 209]";
+    private static final String TEST_BIDS = "[23, 45, 155, 374, 22, 99.99, 100, 101, 115, 209]";
 
     @Autowired
     private MockMvc mockMvc;
 
-    ObjectMapper objectMapper = new ObjectMapper();
-
-    record RequestedRooms(int premium, int economy) {
-    }
-
-    ;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @ParameterizedTest
     @MethodSource
     @DisplayName("Given occupancy requirement, when request is sent, then return optimal room allocation")
     void provideOptimalRoomAllocation(RequestedRooms requestedRooms,
-                                      RoomAvailability response) throws Exception {
+                                      RoomAvailability expectedResponse) throws Exception {
         MvcResult mvcResult = mockMvc
                 .perform(post("/booking")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("premium", String.valueOf(requestedRooms.premium()))
                         .param("economy", String.valueOf(requestedRooms.economy()))
-                        .content(someInput))
+                        .content(TEST_BIDS))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResult = mvcResult.getResponse().getContentAsString();
+        String actualResponse = mvcResult.getResponse().getContentAsString();
 
-        assertThat(actualResult)
-                .isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(response));
+        assertThat(actualResponse)
+                .isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expectedResponse));
     }
 
     private static Stream<Arguments> provideOptimalRoomAllocation() {
