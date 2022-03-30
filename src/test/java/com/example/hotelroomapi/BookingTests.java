@@ -1,7 +1,7 @@
 package com.example.hotelroomapi;
 
 import com.example.hotelroomapi.booking.BookingConfiguration;
-import com.example.hotelroomapi.booking.RoomOccupancyManagerController;
+import com.example.hotelroomapi.booking.BookingController;
 import com.example.hotelroomapi.request.RequestedRooms;
 import com.example.hotelroomapi.booking.RoomAllocation;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,9 +24,9 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = {RoomOccupancyManagerController.class})
+@WebMvcTest(controllers = {BookingController.class})
 @ContextConfiguration(classes = {BookingConfiguration.class})
-class HotelRoomApiApplicationTests {
+class BookingTests {
 
     private static final String TEST_BIDS = "[23, 45, 155, 374, 22, 99.99, 100, 101, 115, 209]";
 

@@ -1,4 +1,4 @@
-package com.example.hotelroomapi.response;
+package com.example.hotelroomapi.booking;
 
 import java.math.BigDecimal;
 

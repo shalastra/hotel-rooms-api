@@ -9,11 +9,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-public class RoomOccupancyManagerController {
+public class BookingController {
 
     private final RoomAllocator roomAllocator;
 
-    public RoomOccupancyManagerController(RoomAllocator roomAllocator) {
+    public BookingController(RoomAllocator roomAllocator) {
         this.roomAllocator = roomAllocator;
     }
 
