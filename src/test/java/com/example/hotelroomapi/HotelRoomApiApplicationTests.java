@@ -1,6 +1,7 @@
 package com.example.hotelroomapi;
 
 import com.example.hotelroomapi.request.RequestedRooms;
+import com.example.hotelroomapi.response.RoomAllocation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,7 +35,7 @@ class HotelRoomApiApplicationTests {
     @MethodSource
     @DisplayName("Given occupancy requirement, when request is sent, then return optimal room allocation")
     void provideOptimalRoomAllocation(RequestedRooms requestedRooms,
-                                      RoomAvailability expectedResponse) throws Exception {
+                                      RoomAllocation expectedResponse) throws Exception {
         MvcResult mvcResult = mockMvc
                 .perform(post("/booking")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -52,7 +53,7 @@ class HotelRoomApiApplicationTests {
 
     private static Stream<Arguments> provideOptimalRoomAllocation() {
         Arguments test1 = arguments(new RequestedRooms(3, 3),
-                new RoomAvailability(3, new BigDecimal("738"), 3, new BigDecimal("167.99")));
+                new RoomAllocation(3, new BigDecimal("738"), 3, new BigDecimal("167.99")));
         /*
           Invalid arguments, in contradiction to the provided business documentation:
           Since the request is 7 premium rooms and 5 economy and provided list of bids has only six above 100 (155, 374, 100, 101, 115, 209),
@@ -63,12 +64,12 @@ class HotelRoomApiApplicationTests {
           It was not defined how the API should behave is a such situation - I decided to correct tests.
          */
         Arguments test2 = arguments(new RequestedRooms(7, 5),
-                new RoomAvailability(7, new BigDecimal("1153.99"), 3, new BigDecimal("90")));
+                new RoomAllocation(7, new BigDecimal("1153.99"), 3, new BigDecimal("90")));
         /*
           A bit different issue here. The provided input is incorrect
          */
         Arguments test3 = arguments(new RequestedRooms(2, 7),
-                new RoomAvailability(2, new BigDecimal("583"), 4, new BigDecimal("189.99")));
+                new RoomAllocation(2, new BigDecimal("583"), 4, new BigDecimal("189.99")));
 
         /*
           Similar issue was here, there is no possibility to receive the price for economy equal to 45.99 (no matching element in the list),
@@ -76,7 +77,7 @@ class HotelRoomApiApplicationTests {
           As in the previous comment, I corrected the test.
          */
         Arguments test4 = arguments(new RequestedRooms(7, 1),
-                new RoomAvailability(7, new BigDecimal("1153.99"), 1, new BigDecimal(45)));
+                new RoomAllocation(7, new BigDecimal("1153.99"), 1, new BigDecimal(45)));
 
         return Stream.of(test1, test2, test3, test4);
     }

@@ -1,5 +1,6 @@
 package com.example.hotelroomapi;
 
+import com.example.hotelroomapi.response.RoomAllocation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,9 +22,9 @@ public class RoomOccupancyManagerController {
     }
 
     @PostMapping("/booking")
-    public RoomAvailability foo(@RequestParam("premium") long premium,
-                                @RequestParam("economy") long economy,
-                                @RequestBody List<BigDecimal> bids) {
+    public RoomAllocation foo(@RequestParam("premium") long premium,
+                              @RequestParam("economy") long economy,
+                              @RequestBody List<BigDecimal> bids) {
         List<BigDecimal> sorted = bids
                 .stream()
                 .sorted(Comparator.reverseOrder()).toList();
@@ -54,6 +55,6 @@ public class RoomOccupancyManagerController {
             reservedEconomyRooms = stepEconomy.size();
         }
 
-        return new RoomAvailability(reservedPremiumRooms, premiumIncome, reservedEconomyRooms, economyIncome);
+        return new RoomAllocation(reservedPremiumRooms, premiumIncome, reservedEconomyRooms, economyIncome);
     }
 }
