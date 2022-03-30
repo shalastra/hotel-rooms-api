@@ -1,7 +1,9 @@
 package com.example.hotelroomapi;
 
+import com.example.hotelroomapi.booking.BookingConfiguration;
+import com.example.hotelroomapi.booking.RoomOccupancyManagerController;
 import com.example.hotelroomapi.request.RequestedRooms;
-import com.example.hotelroomapi.response.RoomAllocation;
+import com.example.hotelroomapi.booking.RoomAllocation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,6 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -21,7 +24,8 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+@WebMvcTest(controllers = {RoomOccupancyManagerController.class})
+@ContextConfiguration(classes = {BookingConfiguration.class})
 class HotelRoomApiApplicationTests {
 
     private static final String TEST_BIDS = "[23, 45, 155, 374, 22, 99.99, 100, 101, 115, 209]";
