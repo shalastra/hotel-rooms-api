@@ -17,7 +17,9 @@ class RoomAllocator {
         return price.compareTo(LIMIT) >= 0;
     }
 
-    public RoomAllocation allocate(final long premium, final long economy, final List<BigDecimal> bids) {
+    public RoomAllocation allocate(final long premiumRequested,
+                                   final long economyRequested,
+                                   final List<BigDecimal> bids) {
         var roomStandards = divideByPremiumAndEconomy(bids);
 
         List<BigDecimal> premiumBids = roomStandards.get(Boolean.TRUE);
@@ -27,21 +29,20 @@ class RoomAllocator {
 
         BigDecimal premiumIncome, economyIncome;
         long reservedPremiumRooms, reservedEconomyRooms;
-        if (premiumBidsAmount >= premium) {
-            premiumIncome = premiumBids.stream().limit(premium).reduce(BigDecimal.ZERO, BigDecimal::add);
-            reservedPremiumRooms = premium;
+        if (premiumBidsAmount >= premiumRequested) {
+            premiumIncome = sumBids(premiumBids, premiumRequested);
+            reservedPremiumRooms = premiumRequested;
 
-            List<BigDecimal> stepEconomy = economyBids.stream().limit(economy).toList();
-            economyIncome = stepEconomy.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-            reservedEconomyRooms = stepEconomy.size();
+            economyIncome = sumBids(economyBids, economyRequested);
+            reservedEconomyRooms = economyBids.stream().limit(economyRequested).count();
         } else {
-            long missing = premium - premiumBidsAmount;
-            BigDecimal partial = premiumBids.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-            premiumIncome = economyBids.stream().limit(missing).reduce(BigDecimal.ZERO, BigDecimal::add).add(partial);
+            long missing = premiumRequested - premiumBidsAmount;
+            BigDecimal partial = sumBids(premiumBids);
+            premiumIncome = sumBids(economyBids, missing).add(partial);
             reservedPremiumRooms = premiumBidsAmount + missing;
 
-            List<BigDecimal> stepEconomy = economyBids.stream().skip(missing).limit(economy).toList();
-            economyIncome = stepEconomy.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+            List<BigDecimal> stepEconomy = economyBids.stream().skip(missing).limit(economyRequested).toList();
+            economyIncome = sumBids(stepEconomy);
             reservedEconomyRooms = stepEconomy.size();
         }
 
@@ -54,5 +55,24 @@ class RoomAllocator {
                 .sorted(Comparator.reverseOrder())
                 .collect(Collectors
                         .partitioningBy(RoomAllocator::divideBy));
+    }
+
+    private BigDecimal sumBids(final List<BigDecimal> bids) {
+        return sumBids(bids, bids.size());
+    }
+
+    private BigDecimal sumBids(final List<BigDecimal> bids, final long limit) {
+        return bids
+                .stream()
+                .limit(limit)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal sumBids(final List<BigDecimal> bids, final long limit, final long skip) {
+        return bids
+                .stream()
+                .skip(skip)
+                .limit(limit)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

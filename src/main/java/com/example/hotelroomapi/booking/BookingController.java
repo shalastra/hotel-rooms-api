@@ -18,9 +18,9 @@ public class BookingController {
     }
 
     @PostMapping("/booking")
-    public RoomAllocation foo(@RequestParam("premium") long premium,
-                              @RequestParam("economy") long economy,
+    public RoomAllocation foo(@RequestParam("premium") long premiumRequested,
+                              @RequestParam("economy") long economyRequested,
                               @RequestBody List<BigDecimal> bids) {
-        return roomAllocator.allocate(premium, economy, bids);
+        return roomAllocator.allocate(premiumRequested, economyRequested, bids);
     }
 }
