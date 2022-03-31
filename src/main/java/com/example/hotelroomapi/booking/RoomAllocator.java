@@ -34,36 +34,28 @@ class RoomAllocator {
         }
     }
 
-    private RoomAllocation allocateRooms(List<BigDecimal> premiumBids, long premiumRequested,
-                                         List<BigDecimal> economyBids, long economyRequested,
-                                         long premiumBidsAmount) {
+    private RoomAllocation allocateRooms(final List<BigDecimal> premiumBids, final long premiumRequested,
+                                         final List<BigDecimal> economyBids, final long economyRequested,
+                                         final long premiumBidsAmount) {
         long premiumRoomsLeft = premiumRequested - premiumBidsAmount;
 
         BigDecimal premiumIncome = sumBids(premiumBids).add(sumBids(economyBids, premiumRoomsLeft));
         long reservedPremiumRooms = premiumBidsAmount + premiumRoomsLeft;
 
         BigDecimal economyIncome = sumBids(economyBids, economyRequested, premiumRoomsLeft);
-        long reservedEconomyRooms = economyBids
-                .stream()
-                .skip(premiumRoomsLeft)
-                .limit(economyRequested)
-                .count();
+        long reservedEconomyRooms = countRooms(economyBids, economyRequested, premiumRoomsLeft);
 
         return new RoomAllocation(reservedPremiumRooms, premiumIncome, reservedEconomyRooms, economyIncome);
     }
 
-    private RoomAllocation allocateRooms(List<BigDecimal> premiumBids, long premiumRequested,
-                                         List<BigDecimal> economyBids, long economyRequested) {
+    private RoomAllocation allocateRooms(final List<BigDecimal> premiumBids, final long premiumRequested,
+                                         final List<BigDecimal> economyBids, final long economyRequested) {
         BigDecimal premiumIncome = sumBids(premiumBids, premiumRequested);
-        long reservedPremiumRooms = premiumRequested;
 
         BigDecimal economyIncome = sumBids(economyBids, economyRequested);
-        long reservedEconomyRooms = economyBids
-                .stream()
-                .limit(economyRequested)
-                .count();
+        long reservedEconomyRooms = countRooms(economyBids, economyRequested);
 
-        return new RoomAllocation(reservedPremiumRooms, premiumIncome, reservedEconomyRooms, economyIncome);
+        return new RoomAllocation(premiumRequested, premiumIncome, reservedEconomyRooms, economyIncome);
     }
 
     private Map<Boolean, List<BigDecimal>> divideByPremiumAndEconomy(final List<BigDecimal> bids) {
@@ -75,14 +67,11 @@ class RoomAllocator {
     }
 
     private BigDecimal sumBids(final List<BigDecimal> bids) {
-        return sumBids(bids, bids.size());
+        return sumBids(bids, bids.size(), 0);
     }
 
     private BigDecimal sumBids(final List<BigDecimal> bids, final long limit) {
-        return bids
-                .stream()
-                .limit(limit)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return sumBids(bids, limit, 0);
     }
 
     private BigDecimal sumBids(final List<BigDecimal> bids, final long limit, final long skip) {
@@ -91,5 +80,17 @@ class RoomAllocator {
                 .skip(skip)
                 .limit(limit)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private long countRooms(final List<BigDecimal> bids, final long limit) {
+        return countRooms(bids, limit, 0);
+    }
+
+    private long countRooms(final List<BigDecimal> bids, final long limit, final long skip) {
+        return bids
+                .stream()
+                .skip(skip)
+                .limit(limit)
+                .count();
     }
 }
